@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { auth, googleProvider }  from '../config/firebaseConfig'
 import { createUserWithEmailAndPassword, signInWithPopup, signOut,} from 'firebase/auth'
 import { db } from "../config/firebaseConfig";
-import {  collection } from "firebase/firestore";
+import {  collection, addDoc } from "firebase/firestore";
 import 'firebase/firestore';
 
 
@@ -16,8 +16,26 @@ export const Auth = () =>{
       //getting the users from firestore
        const usersCollectionRef = collection(db, "users")
 
+        //NewRoom Submission
+ 
+ 
+  
+
       const signUp = async ()=>{
       await createUserWithEmailAndPassword(auth, email, password)
+      try {
+        await addDoc(usersCollectionRef,
+          {
+           userName: userName,
+           email: email,
+           
+           
+          });
+     
+          
+      } catch (error) {
+        console.error(error)
+      }
   
       }
 
