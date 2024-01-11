@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { auth, googleProvider }  from '../config/firebaseConfig'
-import { createUserWithEmailAndPassword, signInWithPopup, signOut, signInWithEmailAndPassword} from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithPopup, signOut,} from 'firebase/auth'
 import { db } from "../config/firebaseConfig";
 import {  collection } from "firebase/firestore";
 import 'firebase/firestore';
@@ -13,34 +13,13 @@ export const Auth = () =>{
       const [password, setPassword] = useState('')
       const [userName, setUserName] = useState('')
 
+      //getting the users from firestore
+       const usersCollectionRef = collection(db, "users")
+
       const signUp = async ()=>{
-        try{
-         await createUserWithEmailAndPassword(auth, email, password,userName)
-         //add user to db
-         const collectionRef = collection(db, 'user');
-         const currentUser = auth().currentUser;
-         const documentId = `${currentUser.uid}`;
-
-const dataToAdd = {
-  userName: userName,
-  email: email,
-  role: password,
-  // ... other fields
-};
-
-collectionRef.doc(documentId).set(dataToAdd)
-  .then(() => {
-    console.log('Document added with specified ID:', documentId);
-  })
-  .catch((error) => {
-    console.error('Error adding document:', error);
-  });
-        }
-        catch(err) {
-            console.log(err)
-        }
-      };
-
+      await createUserWithEmailAndPassword(auth, email, password)
+  
+      }
 
 
 

@@ -1,7 +1,7 @@
 import React ,{ useEffect, useState } from 'react';
-import { db, storage} from "../config/firebaseConfig";
+import { db, } from "../config/firebaseConfig";
 import { getDocs, collection, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import {ref, uploadBytes} from "firebase/storage"
+
 
 
 function CRUD(){
@@ -20,59 +20,17 @@ function CRUD(){
  //update room name state
  const[updatedName, setUpdatedName] = useState('')
 
- //file upload state
- const [roomUpload, setRoomUpload] = useState(null)
-
 //getting the rooms from firestore
  const roomsCollectionRef = collection(db, "rooms")
 
- //delete room
- const deleteRoom = async (id)=>{
-   const roomDoc = doc(db, 'rooms', id);
-   await deleteDoc(roomDoc);
- }
+
 
  //update room name
  const updateRoomName= async (id)=>{
    const roomDoc = doc(db, 'rooms', id);
    await updateDoc(roomDoc, {name: updatedName});
  }
-
- //upload room image
- const uploadFile = async() =>{
-   if (roomUpload) return;
-   const filesFolderRef = ref(storage, `projectFiles/${roomUpload.name}`)
-   try {
-    await uploadBytes(filesFolderRef, roomUpload)
-   } catch (error) {
-    console.error(error)
-   }
-   
- }
-
-
-
-
- //render the rooms
- const getRooms = async () => {
-   //read data
-   try {
-     const data = await getDocs(roomsCollectionRef);
-     const filteredData = data.docs.map((doc) => ({
-       ...doc.data(),
-       id: doc.id,
-     }));
-     setRooms(filteredData);
-   }
-   catch (err) {
-     console.error(err)
-   }
-
-}
-useEffect(() => {
- getRooms();
  
-}, [])
  
  //NewRoom Submission
  const onSubmitRoom = async()=>{
@@ -90,11 +48,39 @@ useEffect(() => {
  
      });
 
-     getRooms();
+     
  } catch (error) {
    console.error(error)
  }
  }
+
+  //delete room
+  const deleteRoom = async (id)=>{
+    const roomDoc = doc(db, 'rooms', id);
+    await deleteDoc(roomDoc);
+  }
+   
+  
+  useEffect(() => {
+   //render the rooms
+   const getRooms = async () => {
+    //read data
+    try {
+      const data = await getDocs(roomsCollectionRef);
+      const filteredData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setRooms(filteredData);
+    }
+    catch (err) {
+      console.error(err)
+    }
+  
+  }
+   getRooms();
+   
+  }, [onSubmitRoom])
 
 
 
@@ -111,12 +97,7 @@ useEffect(() => {
        <input placeholder='capacity...' type='number' onChange={(e)=>setNewRoomCapacity(e.target.value)} />
        <label>room booked?</label><input type="checkbox" checked={currentBooking} onChange={(e)=>setCurrentBooking(e.target.checked)}/>
        <label>book value</label><input type="checkbox" checked={newBookValue} onChange={(e)=>setNewBookValue(e.target.checked)}/>
-        {/* file upload */}
-        <div>
-                <input type="file" onChange={(e)=> setRoomUpload(e.target.files[0])} />
-                <button onClick={uploadFile}> upload room</button>
-           </div>
-       <button onClick={onSubmitRoom}>add room</button>
+       <button onClick={onSubmitRoom}>add room</button> 
      </div>
 
      <div className='firestore-room-render'>
@@ -132,7 +113,7 @@ useEffect(() => {
            <h3 >{room.capacity}</h3>
            <img
             src={room.image}
-            class="img-fluid rounded-top"
+            className="img-fluid rounded-top"
             alt=""
             />
            </div>
